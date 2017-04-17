@@ -1,0 +1,284 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/gruntjs/grunt-contrib-nodeunit#readme"
+
+    >grunt-contrib-nodeunit (v1.0.0)</a>
+</h1>
+<h4>Run Nodeunit unit tests</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.grunt-contrib-nodeunit">module grunt-contrib-nodeunit</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.grunt-contrib-nodeunit.grunt-contrib-nodeunit">
+            function <span class="apidocSignatureSpan"></span>grunt-contrib-nodeunit
+            <span class="apidocSignatureSpan">(grunt)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.grunt-contrib-nodeunit.toString">
+            function <span class="apidocSignatureSpan">grunt-contrib-nodeunit.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.grunt-contrib-nodeunit.toString">module grunt-contrib-nodeunit.toString</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.grunt-contrib-nodeunit.toString.toString">
+            function <span class="apidocSignatureSpan">grunt-contrib-nodeunit.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.grunt-contrib-nodeunit" id="apidoc.module.grunt-contrib-nodeunit">module grunt-contrib-nodeunit</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.grunt-contrib-nodeunit.grunt-contrib-nodeunit" id="apidoc.element.grunt-contrib-nodeunit.grunt-contrib-nodeunit">
+        function <span class="apidocSignatureSpan"></span>grunt-contrib-nodeunit
+        <span class="apidocSignatureSpan">(grunt)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">grunt-contrib-nodeunit = function (grunt) {
+
+  // Nodejs libs.
+  var path = require(&#x27;path&#x27;);
+  var util = require(&#x27;util&#x27;);
+  var fs = require(&#x27;fs&#x27;);
+
+  // External libs.
+  var nodeunit = require(&#x27;nodeunit&#x27;);
+
+  function hook_stdout(callback) {
+    var oldWrite = process.stdout.write;
+
+    process.stdout.write = (function() {
+      return function(string, encoding, fd) {
+        //write.apply(process.stdout, arguments)
+        callback(string, encoding, fd);
+      };
+    })(process.stdout.write);
+
+    return function() {
+      process.stdout.write = oldWrite;
+    };
+  }
+
+  // ==========================================================================
+  // BETTER ERROR DISPLAY
+  // ==========================================================================
+
+  // Much nicer error formatting than what comes with nodeunit.
+  var betterErrors = function (assertion) {
+    var e = assertion.error;
+    if (!e || !(&#x27;actual&#x27; in e) || !(&#x27;expected&#x27; in e)) {
+      return assertion;
+    }
+
+    // Temporarily override the global &#x22;inspect&#x22; property because logging
+    // the entire global object is just silly.
+    var globalInspect = global.inspect;
+    global.inspect = function() {
+      return &#x27;[object global]&#x27;;
+    };
+
+    e._message = e.message;
+
+    // Pretty-formatted objects.
+    var actual = util.inspect(e.actual, { depth: 10, colors: true });
+    var expected = util.inspect(e.expected, { depth: 10, colors: true });
+
+    var indent = function(str) {
+      return (&#x27;&#x27; + str).split(&#x27;\n&#x27;).map(function(s) { return &#x27;  &#x27; + s; }).join(&#x27;\n&#x27;);
+    };
+
+    var stack;
+    var multiline = (actual + expected).indexOf(&#x27;\n&#x27;) !== -1;
+    if (multiline) {
+      stack = [
+        &#x27;Actual:&#x27;, indent(actual),
+        &#x27;Operator:&#x27;, indent(e.operator),
+        &#x27;Expected:&#x27;, indent(expected)
+      ].join(&#x27;\n&#x27;);
+    } else {
+      stack = e.name + &#x27;: &#x27; + actual + &#x27; &#x27; + e.operator + &#x27; &#x27; + expected;
+    }
+
+    if (e.stack) {
+      stack += &#x27;\n&#x27; + e.stack.split(&#x27;\n&#x27;).slice(1).join(&#x27;\n&#x27;);
+    }
+
+    e.stack = stack;
+
+    // Restore the global &#x22;inspect&#x22; property.
+    global.inspect = globalInspect;
+    return assertion;
+  };
+
+  // Reformat stack trace to remove nodeunit scripts, fix indentation, etc.
+  var cleanStack = function(error) {
+    error._stack = error.stack;
+    // Show a full stack trace?
+    var fullStack = grunt.option(&#x27;verbose&#x27;) || grunt.option(&#x27;stack&#x27;);
+    // Reformat stack trace output.
+    error.stack = error.stack.split(&#x27;\n&#x27;).map(function(line) {
+      if (line[0] === &#x27; &#x27;) {
+        // Remove nodeunit script srcs from non-verbose stack trace.
+        if (!fullStack &#x26;&#x26; line.indexOf(path.join(&#x27;node_modules&#x27;, &#x27;nodeunit&#x27;) + path.sep) !== -1) {
+          return &#x27;&#x27;;
+        }
+        // Remove leading spaces.
+        line = line.replace(/^ {4}(?=at)/, &#x27;&#x27;);
+        // Remove cwd.
+        line = line.replace(&#x27;(&#x27; + process.cwd() + path.sep, &#x27;(&#x27;);
+      } else {
+        line = line.replace(/Assertion(Error)/, &#x27;$1&#x27;);
+      }
+      return line + &#x27;\n&#x27;;
+    }).join(&#x27;&#x27;);
+
+    return error;
+  };
+
+  // ==========================================================================
+  // CUSTOM NODEUNIT REPORTER
+  // ==========================================================================
+
+  // Keep track of the last-started module.
+  var currentModule;
+  // Keep track of the last-started test(s).
+  var unfinished = {};
+
+  // If Nodeunit explodes because a test was missing test.done(), handle it.
+  process.on(&#x27;exit&#x27;, function() {
+    var len = Object.keys(unfinished).length;
+    // If there are unfinished tests, tell the user why Nodeunit killed grunt.
+    if (len &#x3e; 0) {
+      grunt.log.muted = false;
+      grunt.verbose.error().or.writeln(&#x27;F&#x27;.red);
+      grunt.log.error(&#x27;Incomplete tests/setups/teardowns:&#x27;);
+      Object.keys(unfinished).forEach(grunt.log.error, grunt.log);
+      grunt.fatal(&#x27;A test was missing test.done(), so nodeunit exploded. Sorry!&#x27;,
+        Math.min(99, 90 + len));
+    }
+  });
+
+  // Keep track of failed assertions for pretty-printing.
+  var failedAssertions = [];
+  function logFailedAssertions() {
+    var assertion;
+    // Print each assertion error + stack.
+    while ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.grunt-contrib-nodeunit.toString" id="apidoc.element.grunt-contrib-nodeunit.toString">
+        function <span class="apidocSignatureSpan">grunt-contrib-nodeunit.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">toString = function () {
+    return text;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.grunt-contrib-nodeunit.toString" id="apidoc.module.grunt-contrib-nodeunit.toString">module grunt-contrib-nodeunit.toString</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.grunt-contrib-nodeunit.toString.toString" id="apidoc.element.grunt-contrib-nodeunit.toString.toString">
+        function <span class="apidocSignatureSpan">grunt-contrib-nodeunit.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function toString() { [native code] }</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
