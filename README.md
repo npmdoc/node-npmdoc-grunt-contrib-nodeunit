@@ -1,4 +1,7 @@
-# api documentation for  [grunt-contrib-nodeunit (v1.0.0)](https://github.com/gruntjs/grunt-contrib-nodeunit#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-grunt-contrib-nodeunit.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-grunt-contrib-nodeunit) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-grunt-contrib-nodeunit.svg)](https://travis-ci.org/npmdoc/node-npmdoc-grunt-contrib-nodeunit)
+# npmdoc-grunt-contrib-nodeunit
+
+#### basic api documentation for  [grunt-contrib-nodeunit (v1.0.0)](https://github.com/gruntjs/grunt-contrib-nodeunit#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-grunt-contrib-nodeunit.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-grunt-contrib-nodeunit) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-grunt-contrib-nodeunit.svg)](https://travis-ci.org/npmdoc/node-npmdoc-grunt-contrib-nodeunit)
+
 #### Run Nodeunit unit tests
 
 [![NPM](https://nodei.co/npm/grunt-contrib-nodeunit.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/grunt-contrib-nodeunit)
@@ -118,7 +121,8 @@
     "scripts": {
         "test": "grunt test && grunt jshint"
     },
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "bin": {}
 }
 ```
 
